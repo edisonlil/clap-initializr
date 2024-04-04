@@ -115,7 +115,6 @@ if generate:
 
             if not os.path.exists(genPath):
                 os.mkdir(genPath)
-            st.write(f"===> {genPath}")
 
 
     iter_dir('./template', func)
