@@ -94,7 +94,7 @@ if generate:
             )
 
             genPath = './gen/' + name
-            if str(file.parent).endswith('template\clap-initializer\clap-initializer-server'):
+            if str(file.parent).__contains__('clap-initializer-server'):
                 genPath = './gen/' + name + '/' + name + '-server'
 
             with open(genPath + "/pom.xml", "w") as pom:
@@ -110,7 +110,7 @@ if generate:
 
             genPath = './gen/' + name
 
-            if str(file).endswith('template\clap-initializer\clap-initializer-server'):
+            if str(file).__contains__('clap-initializer-server'):
                 genPath = './gen/' + name + '/' + name + '-server'
 
             if not os.path.exists(genPath):
