@@ -76,6 +76,9 @@ if generate:
 
     def func(file=Path):
 
+        if not os.path.exists("./gen"):
+            os.mkdir("./gen")
+
         if file.is_file():  # 检查是否为文件
             content = file.read_text("utf-8")
 
