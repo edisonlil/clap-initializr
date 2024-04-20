@@ -74,13 +74,19 @@ if generate:
 
     from jinja2 import Template
 
+
     def func(file=Path):
 
         if not os.path.exists("./gen"):
             os.mkdir("./gen")
 
         if file.is_file():  # 检查是否为文件
-            content = file.read_text("utf-8")
+
+            if file.suffix == ".java":
+                return
+
+
+            content = file.read_text(encoding="utf-8")
 
             template_content = Template(content)
             content = template_content.render(
@@ -93,18 +99,17 @@ if generate:
                 }
             )
 
+            # 构建二级目录
             genPath = './gen/' + name
             if str(file.parent).__contains__('clap-initializer-server'):
                 genPath = './gen/' + name + '/' + name + '-server'
+            elif str(file.parent).__contains__('clap-initializer-sdk'):
+                genPath = './gen/' + name + '/' + name + '-sdk'
 
+            # 生成pom.xml
             with open(genPath + "/pom.xml", "w") as pom:
                 pom.write(content)
 
-            # st.markdown(f"""
-            # ```xml
-            # {content}
-            # ```
-            # """)
             pass
         elif file.is_dir():  # 检查是否为目录
 
@@ -112,17 +117,47 @@ if generate:
 
             if str(file).__contains__('clap-initializer-server'):
                 genPath = './gen/' + name + '/' + name + '-server'
+            elif str(file).__contains__('clap-initializer-sdk'):
+                genPath = './gen/' + name + '/' + name + '-sdk'
 
             if not os.path.exists(genPath):
                 os.mkdir(genPath)
 
+            # 如果是server目录下则
+            if str(file).__contains__('clap-initializer-server'):
+                full_pkg_name = genPath + "/src/main/java/" + pkg_name.replace(".", "/")
+                os.makedirs(full_pkg_name, exist_ok=True)
+                os.makedirs(genPath + "/src/main/resources", exist_ok=True)
+                os.makedirs(genPath + "/src/main/resources/mapper", exist_ok=True)
+
+                # 生成Application.java
+                with open("./template/Application.java") as f:
+                    content = f.read()
+                    template_content = Template(content)
+                    content = template_content.render(
+                        {
+                            "pkgName": pkg_name
+                        }
+                    )
+                    open(full_pkg_name + "/Application.java", "w").write(content)
+
+                # 生成Application.java
+                with open("./template/Application.java") as f:
+                    content = f.read()
+                    template_content = Template(content)
+                    content = template_content.render(
+                        {
+                            "pkgName": pkg_name
+                        }
+                    )
+                    open(full_pkg_name + "/Application.java", "w").write(content)
 
     iter_dir('./template', func)
 
     genPath = './gen/' + name
     zipPath = './gen/' + name + '.zip'
     zipf = zipfile.ZipFile(zipPath, "w", zipfile.ZIP_DEFLATED)
-    zipdir(genPath,zipf)
+    zipdir(genPath, zipf)
     zipf.close()
 
     with open(zipPath, "rb") as f:
